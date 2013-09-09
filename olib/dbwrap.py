@@ -551,5 +551,3 @@ class ConnectionWrapper(object):
     
     def expr(self, value):
         return ExpressionValue(value)
-
-from .dbutils import _munge_sql, _munge_row
