@@ -301,53 +301,6 @@ class CursorWrapper(object):
             else:
                 raise ValueError, "Don't know what to do with these conditions"
         self.execute(sql, *args)
-    
-    # DDL statements
-    
-    def add_fkey(self, table, column, target_table=None, target_column=None):
-        target_table = column[:-3] + 's'
-        target_column = 'id'
-        name = '%s_%s_fk' % (table, column)
-        vars = {
-            'table': table,
-            'column': column,
-            'name': name,
-            'target_table': target_table,
-            'target_column': target_column,
-        }
-        self.execute('''
-            alter table %(table)s add constraint %(name)s
-                foreign key (%(column)s)
-                references %(target_table)s (%(target_column)s)
-        ''' % vars)
-    
-    def list_tables(self):
-        return self.all_values('''
-            select relname from pg_class
-            where relkind='r' and
-                relname not like %s
-                and relname not like %s
-        ''', 'pg_%', 'sql_%')
-    
-    def list_sequences(self):
-        return self.all_values('''
-            select relname from pg_class
-            where relkind='S' and
-                relname not like %s
-                and relname not like %s
-        ''', 'pg_%', 'sql_%')
-    
-    def list_functions(self):
-        public_namespace = self.one_value_check('''
-            select oid from pg_namespace where nspname=?
-        ''', 'public')
-        plpgsql_language = self.one_value_check('''
-            select oid from pg_language where lanname=?
-        ''', 'plpgsql')
-        return self.all_values('''
-            select proname from pg_proc
-            where pronamespace=? and prolang=?
-        ''', public_namespace, plpgsql_language)
 
 class CursorContextManager(object):
     def __init__(self, cursor):
