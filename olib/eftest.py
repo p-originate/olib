@@ -32,6 +32,10 @@ class TestLoader(object):
             suite_tests.sort(test_firstlineno_cmp)
             all_tests += suite_tests
         return all_tests
+    
+    def load_test(self, name, method):
+        tests_in_module = self.load_tests_in_module(name)
+        import ipdb; ipdb.set_trace()
 
 class TestMeta(object):
     def __repr__(self):
@@ -67,6 +71,12 @@ class TestMetaFile(TestMeta):
         raise ValueError, 'No group in meta from file'
 
 class TestDepResolver(object):
+    def __init__(self, test_loader, test_module_prefix):
+        self.test_loader = test_loader
+        self.test_module_prefix = test_module_prefix
+        if not self.test_module_prefix.endswith('.'):
+            self.test_module_prefix += '.'
+    
     def resolve(self, all_tests, requested_tests):
         tests_to_run = []
         
